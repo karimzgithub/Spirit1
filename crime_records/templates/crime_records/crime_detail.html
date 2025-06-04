@@ -1,0 +1,422 @@
+{% extends 'crime_records/base.html' %}
+
+{% block page_title %}Case Details: {{ crime.case_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+            border-bottom: 2px solid #000 !important;
+        }
+        .table {
+            width: 100% !important;
+        }
+        .table th, .table td {
+            padding: 8px !important;
+            border: 1px solid #000 !important;
+        }
+        .badge {
+            border: 1px solid #000 !important;
+        }
+        .img-fluid {
+            max-width: 300px !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-file-alt"></i> Case Details
+                </h3>
+                <div class="btn-group">
+                    <a href="{% url 'crime-list' %}" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <button onclick="window.print()" class="btn btn-primary me-2">
+                        <i class="fas fa-print"></i> Print Record
+                    </button>
+                    <a href="{% url 'crime-update' crime.pk %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'crime-delete' crime.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Print Header -->
+                <div class="text-center mb-4 print-only" style="display: none;">
+                    <h2>Crime Record Details</h2>
+                    <h4>Case Number: {{ crime.case_number }}</h4>
+                    <p>Printed on: {% now "F d, Y H:i" %}</p>
+                    <hr>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i> Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-hashtag"></i> Case Number:</th>
+                                        <td>{{ crime.case_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-exclamation-triangle"></i> Crime Type:</th>
+                                        <td>{{ crime.get_crime_type_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-tag"></i> Status:</th>
+                                        <td>
+                                            <span class="badge {% if crime.status == 'OPEN' %}bg-danger{% elif crime.status == 'UNDER_INVESTIGATION' %}bg-warning{% else %}bg-success{% endif %}">
+                                                <i class="fas {% if crime.status == 'OPEN' %}fa-exclamation-circle{% elif crime.status == 'UNDER_INVESTIGATION' %}fa-clock{% else %}fa-check-circle{% endif %}"></i>
+                                                {{ crime.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-map-marker-alt"></i> Location:</th>
+                                        <td>{{ crime.location }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-calendar"></i> Date Reported:</th>
+                                        <td>{{ crime.date_reported|date:"F d, Y H:i" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-clock"></i> Date Occurred:</th>
+                                        <td>{{ crime.date_occurred|date:"F d, Y H:i" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Registration Details -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-signature"></i> Case Registration Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-file-signature"></i> FIR Number:</th>
+                                        <td>{{ crime.fir_number|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-4">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-calendar-day"></i> FIR Date:</th>
+                                        <td>{{ crime.fir_date|date:"F d, Y"|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-4">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-gavel"></i> Court Case Number:</th>
+                                        <td>{{ crime.court_case_number|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Victim Details -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-shield"></i> Victim Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-user"></i> Name:</th>
+                                        <td>{{ crime.victim_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-birthday-cake"></i> Age:</th>
+                                        <td>{{ crime.victim_age|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-venus-mars"></i> Gender:</th>
+                                        <td>{{ crime.get_victim_gender_display|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-phone"></i> Contact:</th>
+                                        <td>{{ crime.victim_contact|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-map-marker-alt"></i> Address:</th>
+                                        <td>{{ crime.victim_address|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-briefcase"></i> Occupation:</th>
+                                        <td>{{ crime.victim_occupation|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-heart"></i> Marital Status:</th>
+                                        <td>{{ crime.get_victim_marital_status_display|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suspect Details -->
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-secret"></i> Suspect Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-user-secret"></i> Name:</th>
+                                        <td>{{ crime.suspect_name|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-birthday-cake"></i> Age:</th>
+                                        <td>{{ crime.suspect_age|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-venus-mars"></i> Gender:</th>
+                                        <td>{{ crime.get_suspect_gender_display|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-phone"></i> Contact:</th>
+                                        <td>{{ crime.suspect_contact|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-map-marker-alt"></i> Address:</th>
+                                        <td>{{ crime.suspect_address|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-briefcase"></i> Occupation:</th>
+                                        <td>{{ crime.suspect_occupation|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-user-tag"></i> Status:</th>
+                                        <td>{{ crime.get_suspect_status_display|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        {% if crime.suspect_image %}
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-dark text-white">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-id-card"></i> Suspect Image
+                                        </h6>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <img src="{{ crime.suspect_image.url }}" alt="Suspect Image" class="img-fluid rounded">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Evidence Details -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-microscope"></i> Evidence Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-tags"></i> Evidence Type:</th>
+                                        <td>{{ crime.get_evidence_type_display|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-calendar-check"></i> Collection Date:</th>
+                                        <td>{{ crime.evidence_collection_date|date:"F d, Y"|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-map-marker-alt"></i> Location:</th>
+                                        <td>{{ crime.evidence_location|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-align-left"></i> Description:</th>
+                                        <td>{{ crime.evidence_description|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-link"></i> Chain of Custody:</th>
+                                        <td>{{ crime.evidence_chain_of_custody|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        {% if crime.evidence_image %}
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-dark text-white">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-image"></i> Evidence Image
+                                        </h6>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <img src="{{ crime.evidence_image.url }}" alt="Evidence Image" class="img-fluid rounded">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Description and Notes -->
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-align-left"></i> Additional Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6><i class="fas fa-align-left"></i> Description</h6>
+                            <p class="card-text">{{ crime.description }}</p>
+                        </div>
+                        {% if crime.notes %}
+                        <div>
+                            <h6><i class="fas fa-sticky-note"></i> Additional Notes</h6>
+                            <p class="card-text">{{ crime.notes }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Officer Details -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-tie"></i> Officer Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-user"></i> Officer Name:</th>
+                                        <td>{{ crime.officer_name|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-id-badge"></i> Badge/ID Number:</th>
+                                        <td>{{ crime.officer_badge|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tr>
+                                        <th><i class="fas fa-building"></i> Department/Station:</th>
+                                        <td>{{ crime.officer_department|default:"Not specified" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-phone"></i> Contact Info:</th>
+                                        <td>{{ crime.officer_contact|default:"Not specified" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4 no-print">
+                    <a href="{% url 'crime-list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Add print-only class to elements that should only show when printing
+    document.addEventListener('DOMContentLoaded', function() {
+        const printOnlyElements = document.querySelectorAll('.print-only');
+        printOnlyElements.forEach(element => {
+            element.style.display = 'none';
+        });
+    });
+
+    // Show print-only elements when printing
+    window.addEventListener('beforeprint', function() {
+        const printOnlyElements = document.querySelectorAll('.print-only');
+        printOnlyElements.forEach(element => {
+            element.style.display = 'block';
+        });
+    });
+
+    // Hide print-only elements after printing
+    window.addEventListener('afterprint', function() {
+        const printOnlyElements = document.querySelectorAll('.print-only');
+        printOnlyElements.forEach(element => {
+            element.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

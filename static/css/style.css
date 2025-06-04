@@ -1,0 +1,823 @@
+/* Global Styles */
+:root {
+    --primary-color: #1a1a1a;
+    --secondary-color: #2d1b36;
+    --accent-color: #9b4dca;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --light-color: #2d1b36;
+    --dark-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border-color: #3d2b45;
+    --card-bg: #2d1b36;
+    --input-bg: #1a1a1a;
+    --gradient-start: #1a1a1a;
+    --gradient-end: #2d1b36;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #121212;
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end)) !important;
+    padding: 0.5rem 1rem;
+    min-height: 50px;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: white !important;
+    padding: 0.25rem 0;
+}
+
+.navbar-brand i {
+    margin-right: 6px;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    transition: all 0.3s ease;
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.9rem;
+}
+
+.nav-link i {
+    margin-right: 4px;
+    font-size: 0.9rem;
+    color: var(--accent-color);
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+    transform: translateY(-1px);
+}
+
+.navbar-toggler {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+}
+
+.navbar-toggler-icon {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+/* Adjust page header to match new navbar height */
+.page-header {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    color: var(--text-color);
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    border-radius: 0 0 10px 10px;
+}
+
+.page-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* Card Styling */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(155, 77, 202, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    color: var(--text-color);
+    border-radius: 10px 10px 0 0 !important;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Table Styling */
+.table {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 1rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(155, 77, 202, 0.1);
+}
+
+.table td {
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Table Action Buttons */
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-group .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn i {
+    margin-right: 4px;
+}
+
+.btn-info {
+    background-color: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+}
+
+.btn-warning {
+    background-color: #f39c12;
+    border-color: #f39c12;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+    border-color: #e67e22;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+}
+
+/* Table Styles Enhancement */
+.table td {
+    vertical-align: middle;
+}
+
+.table .badge {
+    padding: 0.5rem 0.8rem;
+    font-weight: 500;
+}
+
+/* Button Styling */
+.btn {
+    border-radius: 5px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-primary:hover {
+    background-color: #8a3cb8;
+    border-color: #8a3cb8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(155, 77, 202, 0.2);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* Form Styling */
+.form-control {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 5px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background-color: var(--input-bg);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+    box-shadow: 0 0 0 0.2rem rgba(155, 77, 202, 0.25);
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Badge Styling */
+.badge {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Alert Styling */
+.alert {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.alert-danger {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: var(--danger-color);
+    color: #ff6b6b;
+}
+
+/* Pagination Styling */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+    border: none;
+    margin: 0 2px;
+    border-radius: 5px;
+}
+
+.page-item.active .page-link {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* Login Page Styles */
+.login-page {
+    min-height: 100vh;
+    width: 100%;
+    background-image: url('/static/images/cyber-security-safe-blue-data-600nw-2150809239.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+/* Login Page Navbar */
+.login-page .navbar {
+    background: rgba(26, 26, 26, 0.9);
+    padding: 0.5rem 0;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-page .navbar-brand {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.login-page .navbar-brand i {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+.login-container {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    height: calc(100vh - 60px); /* Subtract navbar height */
+}
+
+.login-form {
+    margin: 0;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 10px;
+    background-color: var(--card-bg);
+    backdrop-filter: blur(10px);
+}
+
+.login-form .card-header {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: var(--text-color);
+    border-radius: 10px 10px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.login-form .card-body {
+    padding: 2rem;
+    background-color: rgba(45, 27, 54, 0.9);
+}
+
+.login-form .text-center {
+    margin-bottom: 2rem;
+}
+
+.login-form .text-center i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.login-form .text-center h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.login-form .text-center p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.login-form .form-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.login-form .form-group .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.login-form .form-label {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.login-form .form-control {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.login-form .btn-primary {
+    padding: 0.6rem 2rem;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+/* Responsive adjustments for login page */
+@media (max-width: 992px) {
+    .login-container {
+        height: auto;
+        min-height: calc(100vh - 60px);
+        padding: 2rem 1rem;
+    }
+
+    .login-form {
+        max-width: 500px;
+    }
+
+    .login-form .form-group {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .login-form .card-body {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1rem;
+    }
+    
+    .login-form .card-body {
+        padding: 1.25rem;
+    }
+    
+    .login-form .card-header {
+        padding: 1rem;
+    }
+}
+
+/* Detail View Specific */
+.detail-section {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.detail-section h5 {
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.detail-section .card-text {
+    color: var(--text-color);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.detail-section table {
+    margin-bottom: 0;
+    color: var(--text-color);
+}
+
+.detail-section table th {
+    color: var(--accent-color);
+    font-weight: 600;
+    width: 40%;
+    border-color: var(--border-color);
+}
+
+.detail-section table td {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        margin: 1rem 0;
+    }
+    
+    .table-responsive {
+        border-radius: 8px;
+    }
+    
+    .btn {
+        padding: 0.4rem 1rem;
+    }
+}
+
+/* Footer */
+.footer {
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 1rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Crime Record Form Styles */
+.crime-form {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.crime-form .card-header {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    padding: 1.5rem;
+}
+
+.crime-form .card-body {
+    padding: 2rem;
+}
+
+.crime-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.crime-form .form-label {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.crime-form .form-control {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.crime-form .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(155, 77, 202, 0.25);
+    background-color: var(--input-bg);
+}
+
+.crime-form textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.crime-form select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e0e0e0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+.crime-form .form-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.crime-form .btn-group {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.crime-form .btn {
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.crime-form .btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.crime-form .btn-primary:hover {
+    background-color: #8a3cb8;
+    border-color: #8a3cb8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(155, 77, 202, 0.2);
+}
+
+.crime-form .btn-secondary {
+    background-color: var(--border-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.crime-form .btn-secondary:hover {
+    background-color: #4a3b55;
+    border-color: #4a3b55;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.crime-form .required-field::after {
+    content: "*";
+    color: var(--danger-color);
+    margin-left: 4px;
+}
+
+.crime-form .form-section {
+    background-color: rgba(155, 77, 202, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.crime-form .form-section-title {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Responsive adjustments for crime form */
+@media (max-width: 768px) {
+    .crime-form {
+        margin: 1rem;
+    }
+
+    .crime-form .card-body {
+        padding: 1.5rem;
+    }
+
+    .crime-form .btn-group {
+        flex-direction: column;
+    }
+
+    .crime-form .btn {
+        width: 100%;
+    }
+}
+
+/* Responsive adjustments for action buttons */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+/* Statistics Cards */
+.card.bg-primary {
+    background: linear-gradient(45deg, #3498db, #2980b9) !important;
+    border: none;
+    box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.card.bg-success {
+    background: linear-gradient(45deg, #2ecc71, #27ae60) !important;
+    border: none;
+    box-shadow: 0 4px 6px rgba(46, 204, 113, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.card.bg-warning {
+    background: linear-gradient(45deg, #f1c40f, #f39c12) !important;
+    border: none;
+    box-shadow: 0 4px 6px rgba(241, 196, 15, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.stat-icon {
+    opacity: 0.8;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card:hover .stat-icon {
+    transform: scale(1.1);
+}
+
+.card .card-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+}
+
+.card h2 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* Search Modal Styles */
+.modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.modal-header {
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-title {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.search-form .form-label {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.search-form .form-control,
+.search-form .form-select {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.search-form .form-control:focus,
+.search-form .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(155, 77, 202, 0.25);
+}
+
+.search-form .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.login-page .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    font-size: 1rem;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.3s ease;
+}
+
+.login-page .nav-link i {
+    margin-right: 6px;
+    color: var(--accent-color);
+}
+
+.login-page .nav-link:hover {
+    color: var(--accent-color) !important;
+    transform: translateY(-1px);
+}
+
+.login-page .nav-link.active {
+    color: var(--accent-color) !important;
+    font-weight: 500;
+} 

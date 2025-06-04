@@ -1,0 +1,1115 @@
+{% extends 'crime_records/base.html' %}
+
+{% block page_title %}
+    {% if form.instance.pk %}Edit Crime Record{% else %}Add New Crime Record{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<!-- External CSS: Flatpickr date picker styling -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    /* ===== Base Theme Styles ===== */
+    /* Dark theme base configuration */
+    body {
+        background-color: #121212;
+        color: #ffffff;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* ===== Card Component Styles ===== */
+    /* Main card container styling */
+    .card {
+        border: none;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        border-radius: 16px;
+        margin-bottom: 35px;
+        background: linear-gradient(145deg, #1e1e1e, #181818);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Card hover animation effect */
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+    }
+
+    /* Card header styling with gradient */
+    .card-header {
+        border-radius: 16px 16px 0 0 !important;
+        padding: 25px;
+        font-weight: 600;
+        background: linear-gradient(145deg, #252525, #1e1e1e);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Card body content area */
+    .card-body {
+        padding: 20px;
+        background: #1e1e1e;
+    }
+
+    /* ===== Form Field Styles ===== */
+    /* Base styling for all form inputs */
+    .form-control, .form-select, textarea {
+        border: 2px solid #3a3a3a;
+        border-radius: 8px;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+        font-size: 15px;
+        color: #ffffff;
+        background: #2a2a2a;
+        width: 100%;
+        margin-bottom: 0;
+        font-family: inherit;
+        min-height: 45px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Form field hover state */
+    .form-control:hover, .form-select:hover, textarea:hover {
+        border-color: #0d6efd;
+        background: #323232;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+
+    /* Form field focus state */
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: #0d6efd;
+        background: #323232;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
+        outline: none;
+    }
+
+    /* ===== Form Labels and Indicators ===== */
+    /* Required field indicator (red asterisk) */
+    .required-field::after {
+        content: " *";
+        color: #ff4444;
+        font-weight: bold;
+    }
+
+    /* Form label styling */
+    .form-label {
+        font-weight: 600;
+        color: #e0e0e0;
+        margin-bottom: 8px;
+        font-size: 15px;
+        display: block;
+        letter-spacing: 0.2px;
+    }
+
+    /* ===== Form Field Containers ===== */
+    /* Container for form fields with hover effects */
+    .form-field-container {
+        background: #2a2a2a;
+        border: 2px solid #3a3a3a;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    /* Form field container hover state */
+    .form-field-container:hover {
+        border-color: #0d6efd;
+        background: #323232;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+
+    /* ===== Alert and Error Messages ===== */
+    /* Error message styling */
+    .alert-danger {
+        background: rgba(255, 68, 68, 0.1);
+        border-color: #ff4444;
+        color: #ff4444;
+    }
+
+    /* ===== Responsive Design ===== */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 15px;
+        }
+        .form-control, .form-select, textarea {
+            font-size: 15px;
+            padding: 10px;
+            min-height: 40px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Main Page Header -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus{% endif %}"></i>
+                {% if form.instance.pk %}Edit Crime Record{% else %}Add New Crime Record{% endif %}
+            </h2>
+            <a href="{% url 'crime-list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Form Container -->
+<div class="card">
+    <div class="card-body">
+        <!-- Form with file upload capability -->
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Form-level Error Display -->
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- ===== Basic Information Section ===== -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Basic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Case Number Field -->
+                    <div class="form-field-container">
+                        <div class="mb-3">
+                            <label for="{{ form.case_number.id_for_label }}" class="form-label required-field">
+                                <i class="fas fa-hashtag"></i> Case Number
+                            </label>
+                            {{ form.case_number }}
+                            {% if form.case_number.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {% for error in form.case_number.errors %}
+                                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Crime Type and Location Fields -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.crime_type.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-exclamation-triangle"></i> Crime Type
+                                    </label>
+                                    {{ form.crime_type }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.location.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-map-marker-alt"></i> Location
+                                    </label>
+                                    {{ form.location }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.date_occurred.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-calendar"></i> Date Occurred
+                                    </label>
+                                    <div class="date-input-container">
+                                        {{ form.date_occurred }}
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-align-left"></i> Description
+                                    </label>
+                                    {{ form.description }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field-container">
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label required-field">
+                                <i class="fas fa-tag"></i> Status
+                            </label>
+                            {{ form.status }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Registration Details Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt"></i> Case Registration Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.fir_number.id_for_label }}" class="form-label">
+                                        <i class="fas fa-file-signature"></i> FIR Number
+                                    </label>
+                                    {{ form.fir_number }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.fir_date.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar"></i> FIR Date
+                                    </label>
+                                    <div class="date-input-container">
+                                        {{ form.fir_date }}
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field-container">
+                        <div class="mb-3">
+                            <label for="{{ form.court_case_number.id_for_label }}" class="form-label">
+                                <i class="fas fa-gavel"></i> Court Case Number
+                            </label>
+                            {{ form.court_case_number }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Victim Details Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-shield"></i> Victim Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.victim_name.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-user"></i> Victim Name
+                                    </label>
+                                    {{ form.victim_name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.victim_age.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-birthday-cake"></i> Victim Age
+                                    </label>
+                                    {{ form.victim_age }}
+                                    {% if form.victim_age.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.victim_age.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.victim_gender.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-venus-mars"></i> Victim Gender
+                                    </label>
+                                    {{ form.victim_gender }}
+                                    {% if form.victim_gender.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.victim_gender.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.victim_contact.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-phone"></i> Victim Contact
+                                    </label>
+                                    {{ form.victim_contact }}
+                                    <small class="form-text text-muted">Enter a 10-digit phone number</small>
+                                    {% if form.victim_contact.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.victim_contact.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.victim_address.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-map-marker-alt"></i> Victim Address
+                                    </label>
+                                    {{ form.victim_address }}
+                                    {% if form.victim_address.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.victim_address.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.victim_occupation.id_for_label }}" class="form-label">
+                                        <i class="fas fa-briefcase"></i> Victim Occupation
+                                    </label>
+                                    {{ form.victim_occupation }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field-container">
+                        <div class="mb-3">
+                            <label for="{{ form.victim_marital_status.id_for_label }}" class="form-label">
+                                <i class="fas fa-heart"></i> Victim Marital Status
+                            </label>
+                            {{ form.victim_marital_status }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suspect Details Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-secret"></i> Suspect Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_name.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-user-secret"></i> Suspect Name
+                                    </label>
+                                    {{ form.suspect_name }}
+                                    {% if form.suspect_name.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.suspect_name.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_age.id_for_label }}" class="form-label">
+                                        <i class="fas fa-birthday-cake"></i> Suspect Age
+                                    </label>
+                                    {{ form.suspect_age }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_gender.id_for_label }}" class="form-label">
+                                        <i class="fas fa-venus-mars"></i> Suspect Gender
+                                    </label>
+                                    {{ form.suspect_gender }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_contact.id_for_label }}" class="form-label">
+                                        <i class="fas fa-phone"></i> Suspect Contact
+                                    </label>
+                                    {{ form.suspect_contact }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_address.id_for_label }}" class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i> Suspect Address
+                                    </label>
+                                    {{ form.suspect_address }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_occupation.id_for_label }}" class="form-label">
+                                        <i class="fas fa-briefcase"></i> Suspect Occupation
+                                    </label>
+                                    {{ form.suspect_occupation }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_image.id_for_label }}" class="form-label">
+                                        <i class="fas fa-id-card"></i> Suspect Image
+                                    </label>
+                                    {{ form.suspect_image }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.suspect_status.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-user-tag"></i> Suspect Status
+                                    </label>
+                                    {{ form.suspect_status }}
+                                    {% if form.suspect_status.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.suspect_status.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evidence Details Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-microscope"></i> Evidence Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.evidence_type.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-tags"></i> Evidence Type
+                                    </label>
+                                    {{ form.evidence_type }}
+                                    {% if form.evidence_type.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.evidence_type.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.evidence_collection_date.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar"></i> Evidence Collection Date
+                                    </label>
+                                    <div class="date-input-container">
+                                        {{ form.evidence_collection_date }}
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.evidence_description.id_for_label }}" class="form-label">
+                                        <i class="fas fa-align-left"></i> Evidence Description
+                                    </label>
+                                    {{ form.evidence_description }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.evidence_location.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-map-marker-alt"></i> Evidence Location
+                                    </label>
+                                    {{ form.evidence_location }}
+                                    {% if form.evidence_location.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.evidence_location.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.evidence_chain_of_custody.id_for_label }}" class="form-label">
+                                        <i class="fas fa-link"></i> Chain of Custody
+                                    </label>
+                                    {{ form.evidence_chain_of_custody }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.evidence_image.id_for_label }}" class="form-label">
+                                        <i class="fas fa-image"></i> Evidence Image
+                                    </label>
+                                    {{ form.evidence_image }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Additional Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-field-container">
+                        <div class="mb-3">
+                            <label for="{{ form.evidence.id_for_label }}" class="form-label">
+                                <i class="fas fa-clipboard-list"></i> Evidence
+                            </label>
+                            {{ form.evidence }}
+                        </div>
+                    </div>
+
+                    <div class="form-field-container">
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officer Details Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-tie"></i> Officer Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.officer_name.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-user"></i> Officer Name
+                                    </label>
+                                    {{ form.officer_name }}
+                                    {% if form.officer_name.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.officer_name.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.officer_badge.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-id-badge"></i> Badge/ID Number
+                                    </label>
+                                    {{ form.officer_badge }}
+                                    {% if form.officer_badge.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.officer_badge.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.officer_department.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-building"></i> Department/Station Name
+                                    </label>
+                                    {{ form.officer_department }}
+                                    {% if form.officer_department.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.officer_department.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-field-container">
+                                <div class="mb-3">
+                                    <label for="{{ form.officer_contact.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-phone"></i> Officer Contact Info
+                                    </label>
+                                    {{ form.officer_contact }}
+                                    <small class="form-text text-muted">Enter a 10-digit phone number</small>
+                                    {% if form.officer_contact.errors %}
+                                    <div class="alert alert-danger mt-2">
+                                        {% for error in form.officer_contact.errors %}
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'crime-list' %}" class="btn btn-secondary me-2">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Record
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Print Template (Hidden) -->
+<div id="printTemplate" style="display: none;">
+    <div class="print-content">
+        <div class="text-center mb-4">
+            <h2>Crime Investigation Report</h2>
+            <p class="text-muted">Generated on: <span id="printDate"></span></p>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Case Number:</strong> <span id="printCaseNumber"></span>
+            </div>
+            <div class="col-6">
+                <strong>FIR Number:</strong> <span id="printFirNumber"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Crime Type:</strong> <span id="printCrimeType"></span>
+            </div>
+            <div class="col-6">
+                <strong>Date Occurred:</strong> <span id="printDateOccurred"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Location:</strong> <span id="printLocation"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Description:</strong>
+                <p id="printDescription"></p>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Victim Information</h4>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Name:</strong> <span id="printVictimName"></span>
+            </div>
+            <div class="col-6">
+                <strong>Age:</strong> <span id="printVictimAge"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Gender:</strong> <span id="printVictimGender"></span>
+            </div>
+            <div class="col-6">
+                <strong>Contact:</strong> <span id="printVictimContact"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Address:</strong> <span id="printVictimAddress"></span>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Suspect Information</h4>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Name:</strong> <span id="printSuspectName"></span>
+            </div>
+            <div class="col-6">
+                <strong>Age:</strong> <span id="printSuspectAge"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Gender:</strong> <span id="printSuspectGender"></span>
+            </div>
+            <div class="col-6">
+                <strong>Status:</strong> <span id="printSuspectStatus"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Address:</strong> <span id="printSuspectAddress"></span>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Investigation Details</h4>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Start Date:</strong> <span id="printInvestigationStart"></span>
+            </div>
+            <div class="col-6">
+                <strong>End Date:</strong> <span id="printInvestigationEnd"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Lead Officer:</strong> <span id="printInvestigationLead"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Summary:</strong>
+                <p id="printInvestigationSummary"></p>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Evidence Information</h4>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Type:</strong> <span id="printEvidenceType"></span>
+            </div>
+            <div class="col-6">
+                <strong>Collected By:</strong> <span id="printEvidenceCollectedBy"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Collection Date:</strong> <span id="printEvidenceCollectionDate"></span>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Witness Information</h4>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Name:</strong> <span id="printWitnessName"></span>
+            </div>
+            <div class="col-6">
+                <strong>Contact:</strong> <span id="printWitnessContact"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Statement:</strong>
+                <p id="printWitnessStatement"></p>
+            </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">Investigating Officer</h4>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Name:</strong> <span id="printOfficerName"></span>
+            </div>
+            <div class="col-6">
+                <strong>Badge/ID:</strong> <span id="printOfficerBadge"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6">
+                <strong>Department:</strong> <span id="printOfficerDepartment"></span>
+            </div>
+            <div class="col-6">
+                <strong>Contact:</strong> <span id="printOfficerContact"></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JavaScript for form functionality -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date pickers
+        flatpickr("#id_date_occurred", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true
+        });
+        
+        flatpickr("#id_fir_date", {
+            dateFormat: "Y-m-d",
+            time_24hr: true
+        });
+        
+        flatpickr("#id_evidence_collection_date", {
+            dateFormat: "Y-m-d",
+            time_24hr: true
+        });
+
+        // Handle evidence image upload
+        const evidenceImageInput = document.querySelector('#id_evidence_image');
+        const evidenceFileNameSpan = document.querySelector('.evidence-file-name');
+        const evidencePreview = document.querySelector('.evidence-image-preview-container img');
+
+        evidenceImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Update file name display
+                evidenceFileNameSpan.textContent = file.name;
+
+                // Check file type
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, PNG, or GIF)');
+                    this.value = '';
+                    evidenceFileNameSpan.textContent = 'No file chosen';
+                    return;
+                }
+
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    this.value = '';
+                    evidenceFileNameSpan.textContent = 'No file chosen';
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    evidencePreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                evidenceFileNameSpan.textContent = 'No file chosen';
+                evidencePreview.src = '';
+            }
+        });
+
+        // Handle suspect image upload and preview
+        const suspectImageInput = document.querySelector('#id_suspect_image');
+        const suspectFileNameSpan = document.querySelector('.suspect-file-name');
+        const suspectPreview = document.querySelector('.suspect-image-preview-container img');
+
+        suspectImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Update file name display
+                suspectFileNameSpan.textContent = file.name;
+
+                // Check file type
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, PNG, or GIF)');
+                    this.value = '';
+                    suspectFileNameSpan.textContent = 'No file chosen';
+                    return;
+                }
+
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    this.value = '';
+                    suspectFileNameSpan.textContent = 'No file chosen';
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    suspectPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                suspectFileNameSpan.textContent = 'No file chosen';
+                suspectPreview.src = '';
+            }
+        });
+
+        // Phone number validation function
+        function validatePhoneNumber(input) {
+            const phoneNumber = input.value.replace(/\D/g, '');
+            if (phoneNumber.length !== 10) {
+                input.setCustomValidity('Phone number must be exactly 10 digits');
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+
+        // Add validation to victim contact
+        const victimContact = document.getElementById('id_victim_contact');
+        victimContact.addEventListener('input', function() {
+            validatePhoneNumber(this);
+        });
+
+        // Add validation to officer contact
+        const officerContact = document.getElementById('id_officer_contact');
+        officerContact.addEventListener('input', function() {
+            validatePhoneNumber(this);
+        });
+
+        // Initial validation
+        validatePhoneNumber(victimContact);
+        validatePhoneNumber(officerContact);
+    });
+
+    function printReport() {
+        // Get all form values
+        const formData = {
+            caseNumber: document.getElementById('id_case_number').value,
+            firNumber: document.getElementById('fir_number').value,
+            crimeType: document.getElementById('id_crime_type').value,
+            dateOccurred: document.getElementById('id_date_occurred').value,
+            location: document.getElementById('id_location').value,
+            description: document.getElementById('id_description').value,
+            victimName: document.getElementById('id_victim_name').value,
+            victimAge: document.getElementById('victim_age').value,
+            victimGender: document.querySelector('input[name="victim_gender"]:checked')?.value,
+            victimContact: document.getElementById('victim_contact').value,
+            victimAddress: document.getElementById('victim_address').value,
+            suspectName: document.getElementById('id_suspect_name').value,
+            suspectAge: document.getElementById('suspect_age').value,
+            suspectGender: document.querySelector('input[name="suspect_gender"]:checked')?.value,
+            suspectStatus: document.getElementById('suspect_status').value,
+            suspectAddress: document.getElementById('suspect_address').value,
+            investigationStart: document.getElementById('investigation_start_date').value,
+            investigationEnd: document.getElementById('investigation_end_date').value,
+            investigationLead: document.getElementById('investigation_lead').value,
+            investigationSummary: document.getElementById('investigation_summary').value,
+            evidenceType: document.getElementById('evidence_type').value,
+            evidenceCollectedBy: document.getElementById('evidence_collected_by').value,
+            evidenceCollectionDate: document.getElementById('evidence_collection_date').value,
+            witnessName: document.getElementById('witness_name').value,
+            witnessContact: document.getElementById('witness_contact').value,
+            witnessStatement: document.getElementById('witness_statement').value,
+            officerName: document.getElementById('officer_name').value,
+            officerBadge: document.getElementById('officer_badge').value,
+            officerDepartment: document.getElementById('officer_department').value,
+            officerContact: document.getElementById('officer_contact').value
+        };
+
+        // Update print template with form values
+        document.getElementById('printDate').textContent = new Date().toLocaleString();
+        document.getElementById('printCaseNumber').textContent = formData.caseNumber;
+        document.getElementById('printFirNumber').textContent = formData.firNumber;
+        document.getElementById('printCrimeType').textContent = formData.crimeType;
+        document.getElementById('printDateOccurred').textContent = formData.dateOccurred;
+        document.getElementById('printLocation').textContent = formData.location;
+        document.getElementById('printDescription').textContent = formData.description;
+        document.getElementById('printVictimName').textContent = formData.victimName;
+        document.getElementById('printVictimAge').textContent = formData.victimAge;
+        document.getElementById('printVictimGender').textContent = formData.victimGender;
+        document.getElementById('printVictimContact').textContent = formData.victimContact;
+        document.getElementById('printVictimAddress').textContent = formData.victimAddress;
+        document.getElementById('printSuspectName').textContent = formData.suspectName;
+        document.getElementById('printSuspectAge').textContent = formData.suspectAge;
+        document.getElementById('printSuspectGender').textContent = formData.suspectGender;
+        document.getElementById('printSuspectStatus').textContent = formData.suspectStatus;
+        document.getElementById('printSuspectAddress').textContent = formData.suspectAddress;
+        document.getElementById('printInvestigationStart').textContent = formData.investigationStart;
+        document.getElementById('printInvestigationEnd').textContent = formData.investigationEnd;
+        document.getElementById('printInvestigationLead').textContent = formData.investigationLead;
+        document.getElementById('printInvestigationSummary').textContent = formData.investigationSummary;
+        document.getElementById('printEvidenceType').textContent = formData.evidenceType;
+        document.getElementById('printEvidenceCollectedBy').textContent = formData.evidenceCollectedBy;
+        document.getElementById('printEvidenceCollectionDate').textContent = formData.evidenceCollectionDate;
+        document.getElementById('printWitnessName').textContent = formData.witnessName;
+        document.getElementById('printWitnessContact').textContent = formData.witnessContact;
+        document.getElementById('printWitnessStatement').textContent = formData.witnessStatement;
+        document.getElementById('printOfficerName').textContent = formData.officerName;
+        document.getElementById('printOfficerBadge').textContent = formData.officerBadge;
+        document.getElementById('printOfficerDepartment').textContent = formData.officerDepartment;
+        document.getElementById('printOfficerContact').textContent = formData.officerContact;
+
+        // Print the report
+        window.print();
+    }
+</script>
+{% endblock %} 

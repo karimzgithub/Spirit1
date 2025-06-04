@@ -1,0 +1,490 @@
+{% extends 'crime_records/base.html' %}
+
+{% block page_title %}Crime Records Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-list"></i> Crime Records</h2>
+            <div class="btn-group">
+                <a href="{% url 'crime-create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Record
+                </a>
+                <a href="{% url 'crime-update-list' %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Update Records
+                </a>
+                <a href="{% url 'crime-delete-list' %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Records
+                </a>
+                <a href="{% url 'crime-search' %}" class="btn btn-info">
+                    <i class="fas fa-search"></i> Search Records
+                </a>
+                <a href="{% url 'crime-view-all' %}" class="btn btn-info">
+                    <i class="fas fa-eye"></i> View All Records
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Records Table -->
+<div class="card mb-5">
+    <div class="card-body">
+        {% if crime_records %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Case Number</th>
+                            <th>Crime Type</th>
+                            <th>Victim Name</th>
+                            <th>Date Reported</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crime in crime_records %}
+                        <tr>
+                            <td>{{ crime.case_number }}</td>
+                            <td>{{ crime.get_crime_type_display }}</td>
+                            <td>{{ crime.victim_name }}</td>
+                            <td>{{ crime.date_reported|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge {% if crime.status == 'OPEN' %}bg-danger{% elif crime.status == 'UNDER_INVESTIGATION' %}bg-warning{% else %}bg-success{% endif %}">
+                                    {{ crime.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'crime-detail' crime.pk %}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <a href="{% url 'crime-update' crime.pk %}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'crime-delete' crime.pk %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No crime records found. Click the "Add New Record" button to create one.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mb-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<!-- Statistics Cards -->
+<div class="row mt-5 mb-5">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Total Records</h6>
+                        <h2 class="mt-2 mb-0">{{ total_records }}</h2>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Open Cases</h6>
+                        <h2 class="mt-2 mb-0">{{ open_cases }}</h2>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-circle fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Closed Cases</h6>
+                        <h2 class="mt-2 mb-0">{{ closed_cases }}</h2>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Under Investigation</h6>
+                        <h2 class="mt-2 mb-0">{{ under_investigation }}</h2>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row mt-5 mb-4">
+    <!-- Crime Type Distribution -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie"></i> Crime Type Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="crimeTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Statistics -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar"></i> Monthly Crime Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyTrendChart" style="height: 400px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script>
+    // Register the datalabels plugin
+    Chart.register(ChartDataLabels);
+
+    // Crime Type Distribution Chart
+    const crimeTypeData = {{ crime_type_data|safe }};
+    const totalCases = crimeTypeData.reduce((sum, item) => sum + item.count, 0);
+    
+    new Chart(document.getElementById('crimeTypeChart'), {
+        type: 'pie',
+        data: {
+            labels: crimeTypeData.map(item => item.type),
+            datasets: [{
+                data: crimeTypeData.map(item => item.count),
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const percentage = ((value / totalCases) * 100).toFixed(1);
+                            return `${context.label}: ${value} cases (${percentage}%)`;
+                        }
+                    }
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                    formatter: function(value) {
+                        const percentage = ((value / totalCases) * 100).toFixed(1);
+                        return percentage + '%';
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    // Monthly Trend Chart
+    const monthlyTrendData = {{ monthly_trend_data|safe }};
+    const monthNames = {
+        1: 'January', 2: 'February', 3: 'March', 4: 'April',
+        5: 'May', 6: 'June', 7: 'July', 8: 'August',
+        9: 'September', 10: 'October', 11: 'November', 12: 'December'
+    };
+
+    // Crime type colors (matching pie chart)
+    const crimeTypeColors = {
+        'Theft': 'rgba(255, 99, 132, 0.8)',      // Pink
+        'Assault': 'rgba(54, 162, 235, 0.8)',    // Blue
+        'Burglary': 'rgba(255, 206, 86, 0.8)',   // Yellow
+        'Fraud': 'rgba(75, 192, 192, 0.8)',      // Teal
+        'Other': 'rgba(153, 102, 255, 0.8)'      // Purple
+    };
+
+    // Create data for all months
+    const allMonthsData = Array.from({ length: 12 }, (_, i) => {
+        const month = i + 1;
+        const monthData = monthlyTrendData.find(item => item.month === month);
+        return {
+            month: month,
+            count: monthData ? monthData.count : 0,
+            records: monthData ? monthData.records : []
+        };
+    });
+
+    // Create datasets for each crime type
+    const crimeTypes = Object.keys(crimeTypeColors);
+    const datasets = crimeTypes.map(crimeType => ({
+        label: crimeType,
+        data: allMonthsData.map(monthData => {
+            const records = monthData.records || [];
+            return records.filter(record => record.crime_type === crimeType).length;
+        }),
+        backgroundColor: crimeTypeColors[crimeType],
+        borderColor: crimeTypeColors[crimeType].replace('0.8', '1'),
+        borderWidth: 1,
+        borderRadius: 5,
+        barThickness: 40,
+        maxBarThickness: 50
+    }));
+
+    new Chart(document.getElementById('monthlyTrendChart'), {
+        type: 'bar',
+        data: {
+            labels: allMonthsData.map(item => monthNames[item.month]),
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            const monthData = allMonthsData[context.dataIndex];
+                            const records = monthData.records;
+                            const crimeType = context.dataset.label;
+                            
+                            if (records && records.length > 0) {
+                                const typeRecords = records.filter(r => r.crime_type === crimeType);
+                                if (typeRecords.length > 0) {
+                                    return [
+                                        `${crimeType} Cases: ${context.raw}`,
+                                        ...typeRecords.map(record => 
+                                            `• Case #${record.case_number}`,
+                                            `  Location: ${record.location}`,
+                                            `  Status: ${record.status}`,
+                                            `  Date: ${record.date_reported}`
+                                        )
+                                    ];
+                                }
+                            }
+                            return `${crimeType}: ${context.raw}`;
+                        }
+                    }
+                },
+                datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 4,
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    formatter: function(value) {
+                        return value > 0 ? value : '';
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    stacked: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Cases',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                x: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Month',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+</script>
+{% endblock %}
+
+/* Sticker Card Styles */
+.sticker-card {
+    background: linear-gradient(145deg, #1e1e1e, #181818);
+    border: none;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 25px;  /* Increased spacing between cards */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.sticker-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+}
+
+/* Row Spacing */
+.row {
+    margin-bottom: 25px;  /* Increased spacing between rows */
+}
+
+/* Column Spacing */
+.col-md-3 {
+    padding: 0 15px;  /* Added horizontal padding between columns */
+}
+
+/* Card Header Spacing */
+.card-header {
+    padding: 20px 25px;  /* Increased padding in card headers */
+    margin-bottom: 15px;  /* Added space between header and content */
+}
+
+/* Card Body Spacing */
+.card-body {
+    padding: 25px;  /* Increased padding in card bodies */
+}
+
+/* Table Spacing */
+.table {
+    margin-bottom: 0;  /* Remove bottom margin from tables */
+}
+
+.table td, .table th {
+    padding: 15px;  /* Increased padding in table cells */
+}
+
+/* Button Spacing */
+.btn-group {
+    gap: 8px;  /* Added gap between buttons */
+}
+
+/* Alert Spacing */
+.alert {
+    margin-bottom: 20px;  /* Increased spacing for alerts */
+}
+
+/* Form Field Spacing */
+.form-field-container {
+    margin-bottom: 20px;  /* Increased spacing between form fields */
+}
+
+/* Section Spacing */
+.card.mb-4 {
+    margin-bottom: 30px !important;  /* Increased spacing between sections */
+} 
